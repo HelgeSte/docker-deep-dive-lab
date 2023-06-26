@@ -1,0 +1,7 @@
+{
+	"tls": true,
+	"tlsverify": true,
+	"tlscacert": "/home/helge/.docker/ca.pem",
+	"tlscert": "/home/helge/.docker/cert.pem",
+	"tlskey": "/home/helge/.docker/key.pem"	
+}

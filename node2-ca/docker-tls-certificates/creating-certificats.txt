@@ -1,0 +1,57 @@
+Create a CA (self-signed certs)
+
+Run the following commands from the CA node in the lab.
+
+1. Create a new private key for the CA.
+	openssl genrsa -aes256 -out ca-key.pem 4096
+
+2. Use the CA's private key to generate a public key (certificate)
+	openssl req -new -x509 -days 730 -key ca-key.pem -sha256 -out ca.pem
+
+You now have two files in your current directy: ca-key.pem and ca.pem. These are the 
+CA's key-pair and form the identity of the CA. At this point, the CA is ready to use.
+
+The ca-key.pem is the privvate key and the ca.pem is the public key.
+
+#######################################
+
+Create a key-pair for the daemon
+
+1. Create the private key for the daemon
+	openssl genrsa -out daemon-key.pem 4096
+
+2. Create a certificate signing request (CSR) for the CA to create and sign a certificate 
+for the daemon. Be sure to use the correct DNS name for your daemon node. The example uses 
+node3.
+	openssl req -subj "/CN=node3" -sha256 -new -key daemon-key.pem -out daemon.csr
+
+3. Add required attributed to the certificate.
+This step creates a file that tells the CA to add a couple of extended attributes to the 
+daemon's certificate when it signs it. These add the daemon's DNS name and IP address, 
+as well as configure the certificate to be valid for server authentication. Create the 
+extfile.cnf with values for DNS and IP address, as well as configure the certificate to 
+be valid for server authentication.
+	# Content of extfile.cnf
+	subjectAltName = DNS:node3,IP:10.0.0.6
+	extendedKeyUsage = serverAuth
+
+4. Generate the certificate. 
+This step uses the CSR file, CA keys, and the extfile.cnf file to sign and configure the 
+daemon's certificate. It will output the daemon's public key (certificate) as a new file 
+called daemon-cert.pem. 
+   	openssl x509 -req -days 730 -sha256 -in daemon.csr -CA ca.pem -CAkey ca-key.pem \
+	-CAcreateserial -out daemon-cert.pem -extfile extfile.cnf
+
+################################
+Create a key-pair for the client
+
+1. Create a private key for node1
+This will generate a new file in your working directory called client-key.pem.
+  	openssl genrsa -out client-key.pem 4096
+
+2. Create a CSR. Be sure to use the correct DNS name of the node that will be your
+secure Docker client. The example uses node1.
+  	openssl req -subj '/CN=node1' -new -key client-key.pem -out client.csr
+
+3. Create a file called extfile.cnf for enabling client authentication
+ 	openssl x509 -req -days 730 -sha256 -in client.csr -CA ca.pem -CAkey ca-key.pem -CAcreateserial -out client-cert.pem -extfile extfile.cnf

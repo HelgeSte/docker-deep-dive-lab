@@ -1,0 +1,15 @@
+remove the "hosts": ["tcp://node3:2376"], from the daemon.json file on 
+systemctl systems: 
+my daemon.json:
+{
+	"tlsverify": true,
+	"tlscacert": "/home/ubuntu/.docker/ca.pem",
+	"tlscert": "/home/ubuntu/.docker/cert.pem",
+	"tlskey": "/home/ubuntu/.docker/key.pem"
+}
+
+sudo systemctl edit docker
+sudo systemctl restart docker.service 
+
+Check the systemctl status in case of an error message:
+	systemctl status docker.service

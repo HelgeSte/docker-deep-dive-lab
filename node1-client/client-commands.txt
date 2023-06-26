@@ -1,0 +1,29 @@
+# these commands are run on the node1 machine
+# node1 is the docker client
+# node2 is the ca 
+# node3 is the docker daemon / server
+
+scp user@node1:~/docker-deep-dive-lab/ca.pem ~/.docker 
+scp user@node2:~/docker-deep-dive-lab/client-cert.pem ~/.docker/ 
+scp user@node2:~/docker-deep-dive-lab/client-key.pem ~/.docker/
+
+cd ~/.docker/
+chmod 0400 client-key.pem 
+chmod -v 0444 ca.pem client-cert.pem 
+
+mv client-key.pem key.pem
+mv client-cert.pem cert.pem
+
+# authenticate 
+docker --tlsverify \
+	--tlscacert=ca.pem \
+	--tlscert=cert.pem \
+	--tlskey=key.pem \
+	-H=node3:2376 version
+
+# node3 = docker daemons ip address
+# after running this command it's possible to run docker commands on the 
+# docker-server (node3) from the client (node1).
+
+# Found some help to problems with connecting from the client on the Docker website:
+# https://docs.docker.com/engine/security/protect-access

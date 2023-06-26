@@ -1,0 +1,12 @@
+Run the /usr/bin/dockerd command from the command line, incase you experience problems. 
+I got an  error when i tried to restart the docker.service, which was caused by not renaming the certificates in the
+~/.docker folder. I had to run the "/usr/bin/dockerd -H tcp://node3:2376" command to see the error.
+
+Also make sure that you have renamed the certifcate files:
+client-key.pem to key.pem
+client-cert.pem to cert.pem
+daemon-key.pem to key.pem
+daemon-cert.pem to cert.pem
+
+Also make sure that you have added the certificates to the ~/.docker folder
+Don't forget the daemon.json file and to run the "systemctl edit docker" command
